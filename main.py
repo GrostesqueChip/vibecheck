@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -5,9 +7,15 @@ from transformers import pipeline
 
 app = FastAPI(title="Sentiment Engine API - Twitter Brain")
 
+cors_origins = os.getenv(
+    "BACKEND_CORS_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000",
+)
+allowed_origins = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -21,9 +29,11 @@ print("Brain loaded and ready for chaos!")
 class TextInput(BaseModel):
     phrase: str
 
+
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "allowed_origins": allowed_origins}
+
 
 @app.post("/analyze")
 async def analyze_sentiment(input_data: TextInput):
