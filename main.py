@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,9 +23,22 @@ app.add_middleware(
 )
 
 print("Downloading the Social Media brain... (might take a minute!)...")
-# We explicitly call a much smarter model trained on modern social media text
-sentiment_pipeline = pipeline("sentiment-analysis", model="cardiffnlp/twitter-roberta-base-sentiment-latest")
-print("Brain loaded and ready for chaos!")
+# We load this lazily on first request so deployment platforms can bind ports quickly.
+sentiment_pipeline: Optional[object] = None
+
+
+def get_sentiment_pipeline():
+    global sentiment_pipeline
+
+    if sentiment_pipeline is None:
+        print("Loading the Social Media brain now... (first request may take a minute)")
+        sentiment_pipeline = pipeline(
+            "sentiment-analysis",
+            model="cardiffnlp/twitter-roberta-base-sentiment-latest",
+        )
+        print("Brain loaded and ready for chaos!")
+
+    return sentiment_pipeline
 
 class TextInput(BaseModel):
     phrase: str
@@ -32,12 +46,17 @@ class TextInput(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "allowed_origins": allowed_origins}
+    return {
+        "status": "ok",
+        "allowed_origins": allowed_origins,
+        "model_loaded": sentiment_pipeline is not None,
+    }
 
 
 @app.post("/analyze")
 async def analyze_sentiment(input_data: TextInput):
-    result = sentiment_pipeline(input_data.phrase)[0]
+    model = get_sentiment_pipeline()
+    result = model(input_data.phrase)[0]
     
     # This model returns 'positive', 'neutral', or 'negative'
     label = result['label']
