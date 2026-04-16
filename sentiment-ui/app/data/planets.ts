@@ -1,0 +1,48 @@
+import type { PlanetDefinition } from "../types/game";
+
+export const planetDefinitions: PlanetDefinition[] = [
+  {
+    id: "mercury",
+    name: "Mercury",
+    kind: "planet",
+    handType: "positive",
+    description: "Upgrade Positive Hands by +15 Chips and +2 Mult per level.",
+    art: "☿",
+    cost: 4,
+    glow: "var(--shadow-glow-blue)",
+    levelBonus: { chips: 15, mult: 2 },
+  },
+  {
+    id: "venus",
+    name: "Venus",
+    kind: "planet",
+    handType: "grateful",
+    description: "Upgrade Grateful Hands by +20 Chips and +3 Mult per level.",
+    art: "♀",
+    cost: 4,
+    glow: "var(--shadow-glow-purple)",
+    levelBonus: { chips: 20, mult: 3 },
+  },
+  {
+    id: "earth",
+    name: "Earth",
+    kind: "planet",
+    handType: "neutral",
+    description: "Upgrade Neutral Hands by +10 Chips and +1 Mult per level.",
+    art: "🌍",
+    cost: 4,
+    glow: "var(--shadow-glow-blue)",
+    levelBonus: { chips: 10, mult: 1 },
+  },
+  {
+    id: "mars",
+    name: "Mars",
+    kind: "planet",
+    handType: "reframe",
+    description: "Upgrade Reframe Hands by +12 Chips and +2 Mult per level.",
+    art: "♂",
+    cost: 4,
+    glow: "var(--shadow-glow-red)",
+    levelBonus: { chips: 12, mult: 2 },
+  },
+];
